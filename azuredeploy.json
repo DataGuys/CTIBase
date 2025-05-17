@@ -664,6 +664,7 @@
                 "[resourceId('Microsoft.Logic/workflows', parameters('playbookName'))]"
             ],
             "properties": {
+                "retentionInterval": "P1D",
                 "azCliVersion": "2.40.0",
                 "timeout": "PT10M",
                 "cleanupPreference": "Always",
