@@ -10,7 +10,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo -e "\n======================================================="
-echo "     MDE Indicator Sync Application Registration Setup"
+echo "     Indicator Sync Application Registration Setup"
 echo "======================================================="
 
 echo -e "${BLUE}Checking prerequisites...${NC}"
@@ -144,18 +144,18 @@ fi
 # Store the secret in Key Vault (without displaying it)
 az keyvault secret set \
   --vault-name "$KV_NAME" \
-  --name "MDEAppSecret" \
+  --name "IndicatorAppSecret" \
   --value "$SECRET_RESULT" \
   --output none
 
-echo -e "${GREEN}Client secret created and securely stored in Key Vault '${KV_NAME}' with name 'MDEAppSecret'${NC}"
+echo -e "${GREEN}Client secret created and securely stored in Key Vault '${KV_NAME}' with name 'IndicatorAppSecret'${NC}"
 
 echo -e "\n======================================================="
 echo "               Setup Complete!"
 echo "======================================================="
 
 echo "App registration has been created successfully with necessary security permissions."
-echo -e "Client secret has been securely stored in Key Vault and will be used by the Logic App."
+echo -e "Client secret has been securely stored in Key Vault and can be used for Logic App permissioning."
 
 echo -e "\n${YELLOW}IMPORTANT NEXT STEPS:${NC}"
 echo "1. Grant admin consent for API permissions in the Azure Portal:"
@@ -167,7 +167,7 @@ echo "   - Click 'Grant admin consent for <your-tenant>'"
 echo -e "\n2. Deploy the MDE Indicator Sync solution using the following parameters:"
 echo "   - Application (Client) ID: ${APP_ID}"
 echo "   - Key Vault Name: ${KV_NAME}"
-echo "   - Secret Name: MDEAppSecret"
+echo "   - Secret Name: IndicatorAppSecret"
 
 echo -e "\nYour app registration and Key Vault details have been saved to: mde-app-credentials.env"
 echo -e "${YELLOW}NOTE: Your client secret has been securely stored in Key Vault and is NOT in the credentials file.${NC}"
