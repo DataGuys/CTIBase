@@ -18,14 +18,14 @@ Before deploying this solution, you must create an application registration with
 
 ```bash
 # Copy and run this in a bash environment (Azure Cloud Shell or WSL)
-curl -sL https://raw.githubusercontent.com/GregoryHall/mde-indicator-sync/main/scripts/create-mde-app-registration.sh | bash
+curl -sL https://raw.githubusercontent.com/DataGuys/CTIBase/refs/heads/main/scripts/create-mde-app-registration.sh | bash
 ```
 
 ## Deployment
 
 Click the button below to deploy this solution to your Azure environment:
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FGregoryHall%2Fmde-indicator-sync%2Fmain%2Fazuredeploy.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FDataGuys%2FCTIBase%2Frefs%2Fheads%2Fmain%2Fazuredeploy.json)
 
 ### Deployment Parameters
 
@@ -74,4 +74,4 @@ If you encounter issues:
 
 ## Contributing
 
-Contributions to improve this solution are welcome. Please submit issues or pull requests as needed.
+Contributions to improve this solution are welcome. Please submit issues or pull requests to the [GitHub repository](https://github.com/DataGuys/CTIBase).

@@ -36,7 +36,14 @@ The app registration is required to grant the Logic App permissions to access th
 
 ## Step 2: Deploy the ARM Template
 
-1. Click the "Deploy to Azure" button in the repository README.md
+You can deploy this solution directly from the GitHub repository:
+
+1. Click the button below to deploy the ARM template:
+
+   [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FDataGuys%2FCTIBase%2Frefs%2Fheads%2Fmain%2Fazuredeploy.json)
+
+   Alternatively, you can deploy the template directly using the following URL:
+   `https://raw.githubusercontent.com/DataGuys/CTIBase/refs/heads/main/azuredeploy.json`
 
 2. Fill in the deployment parameters:
    - **Subscription**: Select your Azure subscription
@@ -105,4 +112,4 @@ If you encounter issues:
   - Verify the custom table name is correct (`MDEIndicators_CL`)
   - Check that indicators exist in the Log Analytics workspace
 
-For additional help, please open an issue in the GitHub repository.
+For additional help, please open an issue in the GitHub repository at [https://github.com/DataGuys/CTIBase](https://github.com/DataGuys/CTIBase).
