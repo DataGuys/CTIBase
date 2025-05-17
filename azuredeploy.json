@@ -121,7 +121,7 @@
                             "type": "string"
                         },
                         {
-                            "name": "title",
+                            "name": "indicatorTitle",
                             "type": "string"
                         },
                         {
@@ -374,7 +374,7 @@
                                             "application": "@{items('Process_Indicators').application}",
                                             "source": "@{items('Process_Indicators').source}",
                                             "sourceType": "@{items('Process_Indicators').sourceType}",
-                                            "title": "@{items('Process_Indicators').title}",
+                                            "indicatorTitle": "@{items('Process_Indicators').title}",
                                             "creationTimeDateTimeUtc": "@{items('Process_Indicators').creationTimeDateTimeUtc}",
                                             "description": "@{items('Process_Indicators').description}",
                                             "expirationTime": "@{items('Process_Indicators').expirationTime}",
@@ -580,7 +580,7 @@
                                             "application": "@triggerBody()?['application']",
                                             "source": "@triggerBody()?['source']",
                                             "sourceType": "@triggerBody()?['sourceType']",
-                                            "title": "@triggerBody()?['title']",
+                                            "title": "@triggerBody()?['indicatorTitle']",
                                             "description": "@triggerBody()?['description']",
                                             "expirationTime": "@triggerBody()?['expirationTime']",
                                             "severity": "@triggerBody()?['severity']",
@@ -616,6 +616,21 @@
                                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('location'), '/managedApis/azuremonitorlogs')]"
                             }
                         }
+                    },
+                    "AppId": {
+                        "value": "[parameters('appId')]"
+                    },
+                    "KeyVaultName": {
+                        "value": "[parameters('keyVaultName')]"
+                    },
+                    "KeyVaultSecretName": {
+                        "value": "[variables('keyVaultSecretName')]"
+                    },
+                    "WorkspaceName": {
+                        "value": "[parameters('workspaceName')]"
+                    },
+                    "CustomTableName": {
+                        "value": "[variables('customTableName')]"
                     }
                 }
             }
@@ -640,7 +655,7 @@
             "kind": "shared",
             "properties": {
                 "displayName": "[parameters('workbookName')]",
-                "serializedData": "{\"version\":\"Notebook/1.0\",\"items\":[{\"type\":1,\"content\":{\"json\":\"# Microsoft Defender for Endpoint Indicator Management\\n\\nThis workbook allows you to view and manage your Microsoft Defender for Endpoint indicators that are synchronized with the Log Analytics workspace.\"},\"name\":\"Title\"},{\"type\":9,\"content\":{\"version\":\"KqlParameterItem/1.0\",\"parameters\":[{\"id\":\"5cd28bf3-7eb5-455f-8eee-a91115c7aa8d\",\"version\":\"KqlParameterItem/1.0\",\"name\":\"TimeRange\",\"type\":4,\"isRequired\":true,\"value\":{\"durationMs\":86400000},\"typeSettings\":{\"selectableValues\":[{\"durationMs\":3600000},{\"durationMs\":14400000},{\"durationMs\":43200000},{\"durationMs\":86400000},{\"durationMs\":172800000},{\"durationMs\":259200000},{\"durationMs\":604800000},{\"durationMs\":1209600000},{\"durationMs\":2592000000}]}}],\"style\":\"pills\",\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\"},\"name\":\"Parameters\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"MDEIndicators_CL\\n| summarize Count=count() by indicatorType_s\\n| sort by Count desc\",\"size\":0,\"title\":\"Indicator Types\",\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\",\"visualization\":\"piechart\"},\"customWidth\":\"50\",\"name\":\"Indicator Types\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"MDEIndicators_CL\\n| summarize Count=count() by directlyAddedToMDE_b\\n| extend Source = iff(directlyAddedToMDE_b == true, 'Added in MDE', 'Added in Workbook')\\n| project Source, Count\",\"size\":0,\"title\":\"Indicator Source\",\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\",\"visualization\":\"piechart\"},\"customWidth\":\"50\",\"name\":\"Indicator Source\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"MDEIndicators_CL\\n| where TimeGenerated > ago({TimeRange})\\n| project\\n    indicatorValue_s,\\n    indicatorType_s,\\n    action_s,\\n    title_s,\\n    severity_s,\\n    confidence_d,\\n    tlpLevel_s,\\n    createdBy_s,\\n    expirationTime_t,\\n    directlyAddedToMDE_b,\\n    modifiedInLogAnalytics_b\\n| order by createdBy_s asc, TimeGenerated desc\",\"size\":0,\"title\":\"All Indicators\",\"showExportToExcel\":true,\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\",\"gridSettings\":{\"filter\":true,\"sortBy\":[{\"itemKey\":\"expirationTime_t\",\"sortOrder\":2}]},\"sortBy\":[{\"itemKey\":\"expirationTime_t\",\"sortOrder\":2}]},\"name\":\"All Indicators\"},{\"type\":1,\"content\":{\"json\":\"## Manage Indicators\\n\\nTo add a new indicator, use the forms below to enter details and submit to the Log Analytics workspace. This will trigger the update playbook to sync with MDE.\"},\"name\":\"Manage Section\"},{\"type\":1,\"content\":{\"json\":\"### Add New Indicator\\n\\nUse this form to add a new indicator. After filling in the details, click the 'Run Query' button, which will generate KQL that can be executed to add the indicator to the Log Analytics workspace.\"},\"name\":\"Add Indicator\"}],\"styleSettings\":{},\"fromTemplateId\":\"sentinel-UserWorkbook\",\"$schema\":\"https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json\"}",
+                "serializedData": "{\"version\":\"Notebook/1.0\",\"items\":[{\"type\":1,\"content\":{\"json\":\"# Microsoft Defender for Endpoint Indicator Management\\n\\nThis workbook allows you to view and manage your Microsoft Defender for Endpoint indicators that are synchronized with the Log Analytics workspace.\"},\"name\":\"Title\"},{\"type\":9,\"content\":{\"version\":\"KqlParameterItem/1.0\",\"parameters\":[{\"id\":\"5cd28bf3-7eb5-455f-8eee-a91115c7aa8d\",\"version\":\"KqlParameterItem/1.0\",\"name\":\"TimeRange\",\"type\":4,\"isRequired\":true,\"value\":{\"durationMs\":86400000},\"typeSettings\":{\"selectableValues\":[{\"durationMs\":3600000},{\"durationMs\":14400000},{\"durationMs\":43200000},{\"durationMs\":86400000},{\"durationMs\":172800000},{\"durationMs\":259200000},{\"durationMs\":604800000},{\"durationMs\":1209600000},{\"durationMs\":2592000000}]}}],\"style\":\"pills\",\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\"},\"name\":\"Parameters\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"MDEIndicators_CL\\n| summarize Count=count() by indicatorType_s\\n| sort by Count desc\",\"size\":0,\"title\":\"Indicator Types\",\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\",\"visualization\":\"piechart\"},\"customWidth\":\"50\",\"name\":\"Indicator Types\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"MDEIndicators_CL\\n| summarize Count=count() by directlyAddedToMDE_b\\n| extend Source = iff(directlyAddedToMDE_b == true, 'Added in MDE', 'Added in Workbook')\\n| project Source, Count\",\"size\":0,\"title\":\"Indicator Source\",\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\",\"visualization\":\"piechart\"},\"customWidth\":\"50\",\"name\":\"Indicator Source\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"MDEIndicators_CL\\n| where TimeGenerated > ago({TimeRange})\\n| project\\n    indicatorValue_s,\\n    indicatorType_s,\\n    action_s,\\n    indicatorTitle_s,\\n    severity_s,\\n    confidence_d,\\n    tlpLevel_s,\\n    createdBy_s,\\n    expirationTime_t,\\n    directlyAddedToMDE_b,\\n    modifiedInLogAnalytics_b\\n| order by createdBy_s asc, TimeGenerated desc\",\"size\":0,\"title\":\"All Indicators\",\"showExportToExcel\":true,\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\",\"gridSettings\":{\"filter\":true,\"sortBy\":[{\"itemKey\":\"expirationTime_t\",\"sortOrder\":2}]},\"sortBy\":[{\"itemKey\":\"expirationTime_t\",\"sortOrder\":2}]},\"name\":\"All Indicators\"},{\"type\":1,\"content\":{\"json\":\"## Manage Indicators\\n\\nTo add a new indicator, use the forms below to enter details and submit to the Log Analytics workspace. This will trigger the update playbook to sync with MDE.\"},\"name\":\"Manage Section\"},{\"type\":1,\"content\":{\"json\":\"### Add New Indicator\\n\\nUse this form to add a new indicator. After filling in the details, click the 'Run Query' button, which will generate KQL that can be executed to add the indicator to the Log Analytics workspace.\"},\"name\":\"Add Indicator\"}],\"styleSettings\":{},\"fromTemplateId\":\"sentinel-UserWorkbook\",\"$schema\":\"https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json\"}",
                 "version": "1.0",
                 "sourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]",
                 "category": "sentinel"
