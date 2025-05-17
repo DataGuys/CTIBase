@@ -303,6 +303,9 @@
                         "CustomTableName": {
                             "defaultValue": "[variables('customTableName')]",
                             "type": "String"
+                        },
+                        "$connections": {
+                            "type": "Object"
                         }
                     },
                     "triggers": {
@@ -501,6 +504,9 @@
                         "CustomTableName": {
                             "defaultValue": "[variables('customTableName')]",
                             "type": "String"
+                        },
+                        "$connections": {
+                            "type": "Object"
                         }
                     },
                     "triggers": {
