@@ -616,21 +616,6 @@
                                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('location'), '/managedApis/azuremonitorlogs')]"
                             }
                         }
-                    },
-                    "AppId": {
-                        "value": "[parameters('appId')]"
-                    },
-                    "KeyVaultName": {
-                        "value": "[parameters('keyVaultName')]"
-                    },
-                    "KeyVaultSecretName": {
-                        "value": "[variables('keyVaultSecretName')]"
-                    },
-                    "WorkspaceName": {
-                        "value": "[parameters('workspaceName')]"
-                    },
-                    "CustomTableName": {
-                        "value": "[variables('customTableName')]"
                     }
                 }
             }
