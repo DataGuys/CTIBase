@@ -651,6 +651,25 @@
                 "sourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]",
                 "category": "sentinel"
             }
+        },
+        {
+            "type": "Microsoft.Resources/deploymentScripts",
+            "apiVersion": "2023-08-01",
+            "name": "assign-ua-identity-to-app",
+            "location": "[parameters('location')]",
+            "kind": "AzureCLI",
+            "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('managedIdentityName'))]",
+                "[resourceId('Microsoft.Logic/workflows', parameters('logicAppName'))]",
+                "[resourceId('Microsoft.Logic/workflows', parameters('playbookName'))]"
+            ],
+            "properties": {
+                "azCliVersion": "2.40.0",
+                "timeout": "PT10M",
+                "cleanupPreference": "Always",
+                "forceUpdateTag": "1",
+                "scriptContent": "[concat('az ad sp owner add --id ', parameters('appId'), ' --owner-object-id ', reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('managedIdentityName')), '2023-01-31').principalId)]"
+            }
         }
     ],
     "outputs": {
