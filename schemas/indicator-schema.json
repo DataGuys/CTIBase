@@ -1,0 +1,71 @@
+{
+  "value": [
+    {
+      "id": "123456",
+      "indicatorValue": "example.com",
+      "indicatorType": "DomainName",
+      "action": "Alert",
+      "title": "Malicious Domain",
+      "description": "Domain associated with phishing campaign",
+      "expirationTime": "2024-12-31T23:59:59Z",
+      "severity": "High",
+      "recommendedActions": "Block this domain",
+      "tlpLevel": "Amber",
+      "confidence": 80,
+      "tags": ["phishing", "malware"],
+      "createdBy": "admin@example.com",
+      "createdBySource": "API",
+      "lastUpdatedBy": "admin@example.com",
+      "lastUpdatedTime": "2023-05-01T12:00:00Z",
+      "additionalInfo": {
+        "source": "Threat Intelligence Feed",
+        "category": "Phishing"
+      }
+    },
+    {
+      "id": "789012",
+      "indicatorValue": "192.168.1.1",
+      "indicatorType": "IpAddress",
+      "action": "Block",
+      "title": "C2 Server IP",
+      "description": "IP address associated with C2 server",
+      "expirationTime": "2024-12-31T23:59:59Z",
+      "severity": "Critical",
+      "recommendedActions": "Block this IP address",
+      "tlpLevel": "Red",
+      "confidence": 95,
+      "tags": ["c2", "malware", "ransomware"],
+      "createdBy": "system@example.com",
+      "createdBySource": "MDE",
+      "lastUpdatedBy": "system@example.com",
+      "lastUpdatedTime": "2023-04-28T14:30:00Z",
+      "additionalInfo": {
+        "source": "Internal Investigation",
+        "category": "Command and Control"
+      }
+    },
+    {
+      "id": "345678",
+      "indicatorValue": "malware.exe",
+      "indicatorType": "FileSha256",
+      "action": "BlockAndRemediate",
+      "title": "Ransomware File",
+      "description": "Known ransomware executable",
+      "expirationTime": "2024-12-31T23:59:59Z",
+      "severity": "Critical",
+      "recommendedActions": "Block and remove this file",
+      "tlpLevel": "Red",
+      "confidence": 100,
+      "tags": ["ransomware", "executable"],
+      "createdBy": "analyst@example.com",
+      "createdBySource": "API",
+      "lastUpdatedBy": "analyst@example.com",
+      "lastUpdatedTime": "2023-05-02T09:15:00Z",
+      "additionalInfo": {
+        "source": "Threat Intelligence Platform",
+        "category": "Ransomware",
+        "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ]
+}
