@@ -54,15 +54,8 @@
             "metadata": {
                 "description": "Unique ID for the workbook"
             }
-        },
-        "repositoryUrl": {
-            "type": "string",
-            "defaultValue": "https://raw.githubusercontent.com/DataGuys/CTIBase/refs/heads/main",
-            "metadata": {
-                "description": "URL to the GitHub repository containing the ARM template"
-            }
         }
-    },
+          },
     "variables": {
         "customTableName": "MDEIndicators_CL",
         "managedIdentityName": "[concat(parameters('logicAppName'), '-identity')]",
@@ -200,7 +193,7 @@
             }
         },
         {
-            "type": "Microsoft.OperationalInsights/workspaces/providers/solutions",
+            "type": "Microsoft.OperationsManagement/solutions",
             "apiVersion": "2015-11-01-preview",
             "name": "[variables('logAnalyticsSolutionName')]",
             "location": "[parameters('location')]",
