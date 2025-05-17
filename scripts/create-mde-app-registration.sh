@@ -27,6 +27,18 @@ TENANT_ID=$(az account show --query tenantId -o tsv)
 echo -e "${GREEN}Using subscription: ${SUB_NAME} (${SUB_ID})${NC}"
 echo -e "${GREEN}Tenant ID: ${TENANT_ID}${NC}"
 
+# Prompt for resource group
+echo -e "${BLUE}Please enter a resource group name to create or use:${NC}"
+read -p "Resource Group Name: " RESOURCE_GROUP
+echo -e "${BLUE}Please enter the Azure region (e.g., eastus, westeurope):${NC}"
+read -p "Azure Region: " LOCATION
+
+# Check if resource group exists, create if it doesn't
+if ! az group show --name "$RESOURCE_GROUP" &> /dev/null; then
+  echo "Creating resource group ${RESOURCE_GROUP} in ${LOCATION}..."
+  az group create --name "$RESOURCE_GROUP" --location "$LOCATION"
+fi
+
 # Create app registration
 APP_NAME="MDE-Indicator-Sync-App"
 echo "Creating app registration: ${APP_NAME}..."
@@ -49,7 +61,7 @@ az ad sp create --id "$APP_ID" || {
 }
 echo -e "${GREEN}Service principal created successfully.${NC}"
 
-# Save credentials to a file
+# Save app ID and other non-sensitive info to a file
 echo "CLIENT_ID=${APP_ID}" > mde-app-credentials.env
 echo "APP_OBJECT_ID=${OBJECT_ID}" >> mde-app-credentials.env
 echo "APP_NAME=${APP_NAME}" >> mde-app-credentials.env
@@ -97,9 +109,31 @@ az ad app permission add --id "$APP_ID" \
 
 echo -e "${GREEN}API permissions added successfully.${NC}"
 
-echo -e "${BLUE}Creating client secret...${NC}"
+# Create a Key Vault for storing the secret
+echo -e "${BLUE}Creating Key Vault to store client secret...${NC}"
+KV_NAME="mde-indicator-kv-$(tr -dc 'a-z0-9' < /dev/urandom | fold -w 8 | head -n 1)"
+echo "Creating Key Vault: ${KV_NAME}..."
+
+az keyvault create \
+  --name "$KV_NAME" \
+  --resource-group "$RESOURCE_GROUP" \
+  --location "$LOCATION" \
+  --sku standard \
+  --enabled-for-template-deployment true \
+  || {
+    echo -e "${RED}Failed to create Key Vault.${NC}"
+    exit 1
+  }
+
+echo -e "${GREEN}Key Vault created successfully: ${KV_NAME}${NC}"
+echo "KEYVAULT_NAME=${KV_NAME}" >> mde-app-credentials.env
+
+# Create client secret
+echo -e "${BLUE}Creating client secret and storing in Key Vault...${NC}"
 SECRET_YEARS=2
 echo "Creating client secret with ${SECRET_YEARS} year(s) duration..."
+
+# Create the secret but don't display it
 SECRET_RESULT=$(az ad app credential reset --id "$APP_ID" --years "$SECRET_YEARS" --query password -o tsv)
 
 if [ -z "$SECRET_RESULT" ]; then
@@ -107,15 +141,22 @@ if [ -z "$SECRET_RESULT" ]; then
   exit 1
 fi
 
-echo "CLIENT_SECRET=${SECRET_RESULT}" >> mde-app-credentials.env
-echo -e "${GREEN}Client secret created successfully and saved to mde-app-credentials.env${NC}"
-echo -e "${YELLOW}IMPORTANT: Keep this file secure as it contains your client secret!${NC}"
+# Store the secret in Key Vault (without displaying it)
+az keyvault secret set \
+  --vault-name "$KV_NAME" \
+  --name "MDEAppSecret" \
+  --value "$SECRET_RESULT" \
+  --output none
+
+echo -e "${GREEN}Client secret created and securely stored in Key Vault '${KV_NAME}' with name 'MDEAppSecret'${NC}"
 
 echo -e "\n======================================================="
 echo "               Setup Complete!"
 echo "======================================================="
 
 echo "App registration has been created successfully with necessary security permissions."
+echo -e "Client secret has been securely stored in Key Vault and will be used by the Logic App."
+
 echo -e "\n${YELLOW}IMPORTANT NEXT STEPS:${NC}"
 echo "1. Grant admin consent for API permissions in the Azure Portal:"
 echo "   - Navigate to: Microsoft Entra ID > App registrations"
@@ -123,16 +164,10 @@ echo "   - Select your app: ${APP_NAME}"
 echo "   - Go to 'API permissions'"
 echo "   - Click 'Grant admin consent for <your-tenant>'"
 
-echo -e "\n2. Add the client secret to your Key Vault:"
-echo "   - Run the following commands to add the secret to your Key Vault after deployment:"
-echo "   ----------------------------------------"
-echo "   az keyvault secret set --vault-name YOUR_KEYVAULT_NAME --name MDEAppSecret --value ${SECRET_RESULT}"
-echo "   ----------------------------------------"
+echo -e "\n2. Deploy the MDE Indicator Sync solution using the following parameters:"
+echo "   - Application (Client) ID: ${APP_ID}"
+echo "   - Key Vault Name: ${KV_NAME}"
+echo "   - Secret Name: MDEAppSecret"
 
-echo -e "\n3. Deploy the MDE Indicator Sync solution using the 'Deploy to Azure' button in the README"
-echo "   and provide the following Application (Client) ID when prompted:"
-echo "   ----------------------------------------"
-echo "   ${APP_ID}"
-echo "   ----------------------------------------"
-
-echo -e "\nYour app credentials have been saved to: mde-app-credentials.env"
+echo -e "\nYour app registration and Key Vault details have been saved to: mde-app-credentials.env"
+echo -e "${YELLOW}NOTE: Your client secret has been securely stored in Key Vault and is NOT in the credentials file.${NC}"
