@@ -1,16 +1,18 @@
 # Microsoft Defender for Endpoint Indicator Management
 
-This solution provides a comprehensive system for managing Microsoft Defender for Endpoint (MDE) indicators through a custom Log Analytics workspace and table. It automatically synchronizes indicators between MDE and Azure Sentinel, providing a centralized management interface.
+This solution provides a comprehensive system for managing Microsoft Defender for Endpoint (MDE) indicators through a custom Log Analytics workspace and table. It automatically synchronizes indicators between MDE and a separate log analytics workspace with dashboard workbooks, providing a centralized management interface.
 
 ## Overview
 
 The solution includes:
 
-- Custom Log Analytics table for storing MDE indicators
-- Logic App to synchronize indicators from MDE every 6 hours
-- Workbook for visualization and management of indicators
-- Playbook to sync changes back to MDE
-- Key Vault integration for secure credential storage
+- Custom Log Analytics table for storing MDE indicators matching the MDE Indicators API schema
+- Logic Apps to enable bidirectional synchronionazation of indicators to and from MDE every 6 hours
+- Workbook for visualization and management (adds/deletes) of indicators
+- Key Vault integration for secure credential storage of API keys
+- VirusTotal IoC enrichment
+- Criminal IP IoC enrichment
+- AbuseIPDB IP IoC enrichment
 
 ## Prerequisites
 
@@ -27,7 +29,7 @@ Click the button below to deploy this solution to your Azure environment:
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FDataGuys%2FCTIBase%2Frefs%2Fheads%2Fmain%2Fazuredeploy.json)
 
-### Deployment Parameters
+### Deployment Parameters Available During Azure Deployment Wizard
 
 | Parameter | Description |
 |-----------|-------------|
