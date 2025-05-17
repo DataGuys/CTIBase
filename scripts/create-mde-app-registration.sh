@@ -175,6 +175,28 @@ az keyvault create \
 echo -e "${GREEN}Key Vault created successfully: ${KV_NAME}${NC}"
 echo "KEYVAULT_NAME=${KV_NAME}" >> indicator-app-credentials.env
 
+# Assign Key Vault Secrets Officer role to the current user
+echo -e "${BLUE}Assigning Key Vault permissions to current user...${NC}"
+USER_ID=$(az ad signed-in-user show --query id -o tsv)
+if [ -z "$USER_ID" ]; then
+  echo -e "${RED}Unable to retrieve current user ID. Make sure you are logged in with az login.${NC}"
+  exit 1
+fi
+
+echo "Granting Key Vault Secrets Officer role to current user..."
+az role assignment create \
+  --role "Key Vault Secrets Officer" \
+  --assignee "$USER_ID" \
+  --scope "/subscriptions/$SUB_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.KeyVault/vaults/$KV_NAME" \
+  || {
+    echo -e "${RED}Failed to assign Key Vault role. You may need to manually assign permissions.${NC}"
+    echo -e "${YELLOW}Manual steps: Go to the Key Vault in Azure Portal, select Access Control (IAM), add yourself as 'Key Vault Secrets Officer'.${NC}"
+  }
+
+# Wait for permissions to propagate
+echo "Waiting 15 seconds for RBAC permissions to propagate..."
+sleep 15
+
 # Create client secret
 echo -e "${BLUE}Creating client secret and storing in Key Vault...${NC}"
 SECRET_YEARS=2
