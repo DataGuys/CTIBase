@@ -1,5 +1,5 @@
 #!/bin/bash
-# MDE Indicator Sync App Registration Script - Permissions for the Logic Apps to access MDE indicators
+# Indicator Sync App Registration Script - Permissions for the Logic Apps to access indicators
 set -e
 
 # Color definitions for output
@@ -12,6 +12,36 @@ NC='\033[0m' # No Color
 echo -e "\n======================================================="
 echo "     Indicator Sync Application Registration Setup"
 echo "======================================================="
+
+# Handle command-line arguments
+RESOURCE_GROUP=""
+LOCATION=""
+
+# Parse command-line arguments
+while [[ $# -gt 0 ]]; do
+  key="$1"
+  case $key in
+    -g|--resource-group)
+      RESOURCE_GROUP="$2"
+      shift 2
+      ;;
+    -l|--location)
+      LOCATION="$2"
+      shift 2
+      ;;
+    -h|--help)
+      echo "Usage: $0 [options]"
+      echo "Options:"
+      echo "  -g, --resource-group    Resource group name"
+      echo "  -l, --location          Azure region (e.g., eastus, westeurope)"
+      echo "  -h, --help              Show this help message"
+      exit 0
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
 
 echo -e "${BLUE}Checking prerequisites...${NC}"
 if ! az account show &> /dev/null; then
@@ -27,11 +57,28 @@ TENANT_ID=$(az account show --query tenantId -o tsv)
 echo -e "${GREEN}Using subscription: ${SUB_NAME} (${SUB_ID})${NC}"
 echo -e "${GREEN}Tenant ID: ${TENANT_ID}${NC}"
 
-# Prompt for resource group
-echo -e "${BLUE}Please enter a resource group name to create or use:${NC}"
-read -p "Resource Group Name: " RESOURCE_GROUP
-echo -e "${BLUE}Please enter the Azure region (e.g., eastus, westeurope):${NC}"
-read -p "Azure Region: " LOCATION
+# Prompt for resource group and location if not provided as arguments
+if [ -z "$RESOURCE_GROUP" ]; then
+  if [ -t 0 ]; then  # Check if stdin is a terminal
+    echo -e "${BLUE}Please enter a resource group name to create or use:${NC}"
+    read -p "Resource Group Name: " RESOURCE_GROUP
+  else
+    # Default resource group name when run non-interactively
+    RESOURCE_GROUP="mde-indicator-sync-rg"
+    echo "Using default resource group: $RESOURCE_GROUP"
+  fi
+fi
+
+if [ -z "$LOCATION" ]; then
+  if [ -t 0 ]; then  # Check if stdin is a terminal
+    echo -e "${BLUE}Please enter the Azure region (e.g., eastus, westeurope):${NC}"
+    read -p "Azure Region: " LOCATION
+  else
+    # Default location when run non-interactively
+    LOCATION="eastus"
+    echo "Using default location: $LOCATION"
+  fi
+fi
 
 # Check if resource group exists, create if it doesn't
 if ! az group show --name "$RESOURCE_GROUP" &> /dev/null; then
@@ -40,7 +87,7 @@ if ! az group show --name "$RESOURCE_GROUP" &> /dev/null; then
 fi
 
 # Create app registration
-APP_NAME="MDE-Indicator-Sync-App"
+APP_NAME="Indicator-Sync-App"
 echo "Creating app registration: ${APP_NAME}..."
 APP_CREATE=$(az ad app create --display-name "${APP_NAME}")
 APP_ID=$(echo "$APP_CREATE" | jq -r '.appId // .id')
@@ -62,9 +109,9 @@ az ad sp create --id "$APP_ID" || {
 echo -e "${GREEN}Service principal created successfully.${NC}"
 
 # Save app ID and other non-sensitive info to a file
-echo "CLIENT_ID=${APP_ID}" > mde-app-credentials.env
-echo "APP_OBJECT_ID=${OBJECT_ID}" >> mde-app-credentials.env
-echo "APP_NAME=${APP_NAME}" >> mde-app-credentials.env
+echo "CLIENT_ID=${APP_ID}" > indicator-app-credentials.env
+echo "APP_OBJECT_ID=${OBJECT_ID}" >> indicator-app-credentials.env
+echo "APP_NAME=${APP_NAME}" >> indicator-app-credentials.env
 
 echo -e "${BLUE}Adding required permissions...${NC}"
 
@@ -111,7 +158,7 @@ echo -e "${GREEN}API permissions added successfully.${NC}"
 
 # Create a Key Vault for storing the secret
 echo -e "${BLUE}Creating Key Vault to store client secret...${NC}"
-KV_NAME="mde-indicator-kv-$(tr -dc 'a-z0-9' < /dev/urandom | fold -w 8 | head -n 1)"
+KV_NAME="indicator-kv-$(tr -dc 'a-z0-9' < /dev/urandom | fold -w 8 | head -n 1)"
 echo "Creating Key Vault: ${KV_NAME}..."
 
 az keyvault create \
@@ -126,7 +173,7 @@ az keyvault create \
   }
 
 echo -e "${GREEN}Key Vault created successfully: ${KV_NAME}${NC}"
-echo "KEYVAULT_NAME=${KV_NAME}" >> mde-app-credentials.env
+echo "KEYVAULT_NAME=${KV_NAME}" >> indicator-app-credentials.env
 
 # Create client secret
 echo -e "${BLUE}Creating client secret and storing in Key Vault...${NC}"
@@ -155,7 +202,7 @@ echo "               Setup Complete!"
 echo "======================================================="
 
 echo "App registration has been created successfully with necessary security permissions."
-echo -e "Client secret has been securely stored in Key Vault and can be used for Logic App permissioning."
+echo -e "Client secret has been securely stored in Key Vault and will be used by the Logic App."
 
 echo -e "\n${YELLOW}IMPORTANT NEXT STEPS:${NC}"
 echo "1. Grant admin consent for API permissions in the Azure Portal:"
@@ -164,10 +211,12 @@ echo "   - Select your app: ${APP_NAME}"
 echo "   - Go to 'API permissions'"
 echo "   - Click 'Grant admin consent for <your-tenant>'"
 
-echo -e "\n2. Deploy the MDE Indicator Sync solution using the following parameters:"
+echo -e "\n2. Deploy the Indicator Sync solution using the following parameters:"
 echo "   - Application (Client) ID: ${APP_ID}"
 echo "   - Key Vault Name: ${KV_NAME}"
 echo "   - Secret Name: IndicatorAppSecret"
 
-echo -e "\nYour app registration and Key Vault details have been saved to: mde-app-credentials.env"
+echo -e "\n${YELLOW}IMPORTANT: When piping this script directly from curl, use:${NC}"
+echo "curl -sL https://raw.githubusercontent.com/DataGuys/CTIBase/refs/heads/main/scripts/create-mde-app-registration.sh | bash -s -- --resource-group YOUR_RG_NAME --location YOUR_LOCATION"
+echo -e "\nYour app registration and Key Vault details have been saved to: indicator-app-credentials.env"
 echo -e "${YELLOW}NOTE: Your client secret has been securely stored in Key Vault and is NOT in the credentials file.${NC}"

@@ -18,7 +18,7 @@ Before deploying this solution, you must create an application registration with
 
 ```bash
 # Copy and run this in a bash environment (Azure Cloud Shell or WSL)
-curl -sL https://raw.githubusercontent.com/DataGuys/CTIBase/refs/heads/main/scripts/create-mde-app-registration.sh | tr -d '\r' | bash
+curl -sL https://raw.githubusercontent.com/DataGuys/CTIBase/refs/heads/main/scripts/create-mde-app-registration.sh | bash
 ```
 
 ## Deployment
